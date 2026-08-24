@@ -41,7 +41,6 @@ do
 		fontSize = 10,
 		fontSizeEmph = 13,
 		texture = "BantoBar",
-		colorByType = false,
 		monochrome = false,
 		outline = "NONE",
 		growup = false,
@@ -545,13 +544,6 @@ do
 						name = L.monochrome,
 						desc = L.monochromeDesc,
 						order = 3,
-					},
-					colorByType = {
-						type = "toggle",
-						name = L.colorBarsByType,
-						desc = L.colorBarsByTypeDesc,
-						order = 3.5,
-						width = "full",
 					},
 					header1 = {
 						type = "header",
@@ -1823,7 +1815,7 @@ do
 	end
 
 	local function GetBarColorHint(module, key)
-		if db.colorByType and module and module.colorOptions then
+		if colors.db.profile.colorByType and module and module.colorOptions then
 			local hint = module.colorOptions[key]
 			if type(hint) == "string" then
 				return hint

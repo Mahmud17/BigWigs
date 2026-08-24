@@ -28,6 +28,8 @@ plugin.defaultDB = {
 	barTextShadow = { ["*"] = { ["*"] = { 0, 0, 0, 1 } } },
 	barColor = { ["*"] = { ["*"] = { 0.25, 0.33, 0.68, 1 } } },
 	barEmphasized = { ["*"] = { ["*"] = { 1, 0, 0, 1 } } },
+
+	colorByType = false,
 }
 
 local function copyTable(to, from)
@@ -245,6 +247,15 @@ local defaultKey = "default"
 plugin.pluginOptions = copyTable({}, plugin:SetColorOptions(plugin.name, defaultKey))
 plugin.pluginOptions.inline = nil
 plugin.pluginOptions.args.reset.width = nil --"half"
+plugin.pluginOptions.args.colorByType = {
+	type = "toggle",
+	name = L.colorBarsByType,
+	desc = L.colorBarsByTypeDesc,
+	get = function() return plugin.db.profile.colorByType end,
+	set = function(_, value) plugin.db.profile.colorByType = value end,
+	order = 2.5,
+	width = "full",
+}
 plugin.pluginOptions.args.resetAll = {
 	type = "execute",
 	name = L.resetAll,
