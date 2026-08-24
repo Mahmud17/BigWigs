@@ -41,6 +41,7 @@ do
 		fontSize = 10,
 		fontSizeEmph = 13,
 		texture = "BantoBar",
+		colorByType = false,
 		monochrome = false,
 		outline = "NONE",
 		growup = false,
@@ -544,6 +545,13 @@ do
 						name = L.monochrome,
 						desc = L.monochromeDesc,
 						order = 3,
+					},
+					colorByType = {
+						type = "toggle",
+						name = L.colorBarsByType,
+						desc = L.colorBarsByTypeDesc,
+						order = 3.5,
+						width = "full",
 					},
 					header1 = {
 						type = "header",
@@ -1814,6 +1822,16 @@ do
 		end
 	end
 
+	local function GetBarColorHint(module, key)
+		if db.colorByType and module and module.colorOptions then
+			local hint = module.colorOptions[key]
+			if type(hint) == "string" then
+				return hint
+			end
+		end
+		return "barColor"
+	end
+
 	local initial = true
 	function plugin:CreateBar(module, key, text, time, icon, isApprox, eventId, spellIndicators)
 		local width, height
@@ -1842,7 +1860,7 @@ do
 		else
 			bar:SetIcon(nil)
 		end
-		bar:SetColor(colors:GetColor("barColor", module, key))
+		bar:SetColor(colors:GetColor(GetBarColorHint(module, key), module, key))
 		bar:SetBackgroundColor(colors:GetColor("barBackground", module, key))
 		bar:SetTextColor(colors:GetColor("barText", module, key))
 		bar:SetShadowColor(colors:GetColor("barTextShadow", module, key))
