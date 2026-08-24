@@ -256,6 +256,26 @@ plugin.pluginOptions.args.colorByType = {
 	order = 2.5,
 	width = "full",
 }
+plugin.pluginOptions.args.testBarColor = {
+	type = "execute",
+	name = L.testBarColorBtn,
+	desc = L.testBarColorBtn_desc,
+	func = function()
+		for _, module in BigWigs:IterateBossModules() do
+			if module.colorOptions then
+				for key, hint in next, module.colorOptions do
+					if type(hint) == "string" then
+						plugin:SendMessage("BigWigs_StartBar", module, key, ("%s (%s)"):format(L.test, hint), 15)
+						return
+					end
+				end
+			end
+		end
+		plugin:Print(L.testBarColorBtn_none)
+	end,
+	order = 2.6,
+	width = "full",
+}
 plugin.pluginOptions.args.resetAll = {
 	type = "execute",
 	name = L.resetAll,
