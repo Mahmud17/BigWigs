@@ -47,13 +47,10 @@ do
 		self:Fire("OnClosed")
 	end)
 
-	local PopulateItems -- defined below, forward-declared for use in the search box and toggle handler
+	local PopulateItems -- defined below
 
-	-- Extra vertical space the search box claims from the pullout's own frame. The external
-	-- Dropdown-Pullout sizes its frame purely from item count (see AddItem's "h + 34"), with
-	-- no idea we've pushed its scroll area down to make room for the search box, so that has
-	-- to be compensated for here or short result lists end up with a squashed, near-invisible
-	-- scroll viewport.
+	-- AddItem's own "h + 34" height formula doesn't know we push the scroll area down for
+	-- the search box, so this has to be added back on or short lists get a squashed viewport.
 	local HEADER_HEIGHT = 20
 
 	local function Reopen(self)
@@ -72,21 +69,18 @@ do
 		end
 	end
 
-	-- SearchBoxTemplate already provides a localized instructional text (the global SEARCH
-	-- string), a search icon and a clear button, so there's nothing left to build by hand.
 	local search = CreateFrame("EditBox", nil, _pullout.frame, "SearchBoxTemplate")
 	search:SetHeight(HEADER_HEIGHT)
 	search:SetPoint("TOPLEFT", _pullout.frame, "TOPLEFT", 14, -8)
 	search:SetPoint("TOPRIGHT", _pullout.frame, "TOPRIGHT", -14, -8)
 
-	-- The pullout's scroll area is anchored by the external Dropdown-Pullout widget itself;
-	-- push it down to make room for the search box instead of floating the box on top of it.
+	-- Push the pullout's own scroll area down to make room for the search box above it.
 	_pullout.scrollFrame:ClearAllPoints()
 	_pullout.scrollFrame:SetPoint("TOPLEFT", _pullout.frame, "TOPLEFT", 6, -12 - HEADER_HEIGHT)
 	_pullout.scrollFrame:SetPoint("BOTTOMRIGHT", _pullout.frame, "BOTTOMRIGHT", -6, 12)
 
-	-- Rebuilding every matching item widget is what's actually expensive (not the filtering
-	-- itself), so cap how many get created per rebuild and let the search narrow the rest down.
+	-- Rebuilding every matching item widget (not the filtering) is what's actually expensive,
+	-- so cap how many get created per rebuild and let the search narrow the rest down.
 	local MAX_RESULTS = 60
 	local function ApplyFilter(self, text)
 		PopulateItems(self, text)
