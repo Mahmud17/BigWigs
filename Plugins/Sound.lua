@@ -302,7 +302,11 @@ end
 --
 
 function plugin:OnPluginEnable()
-	updateProfile()
+	db = plugin.db.profile
+	-- Delay the validation pass: other addons that register their own custom sounds via
+	-- LibSharedMedia may not have done so yet this early in the load sequence, and running
+	-- this immediately would wipe a still-valid custom sound choice as if it no longer existed.
+	BigWigsLoader.CTimerAfter(3, updateProfile)
 
 	soundList = LibSharedMedia:List(SOUND)
 	allowBlizzMessages = true
