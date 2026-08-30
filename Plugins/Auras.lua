@@ -2258,9 +2258,8 @@ do
 		aura:SetSize(size, size) -- CustomAuraContainerFlowLayoutDescription:ApplyElementLayout doesn't set size
 
 		local identityHighlight = aura:CreateTexture(nil, "BACKGROUND", nil, -1)
-		identityHighlight:SetPoint("TOPLEFT", -3, 3)
-		identityHighlight:SetPoint("BOTTOMRIGHT", 3, -3)
 		identityHighlight:SetColorTexture(unpack(identityHighlightColors[unitType]))
+		aura.identityHighlight = identityHighlight
 
 		local icon = aura:CreateTexture(nil, "BACKGROUND")
 		icon:SetAllPoints()
@@ -2466,6 +2465,12 @@ do
 		else
 			aura.border:ClearBackdrop()
 		end
+
+		-- Sit outside the dispel-type border ring (when shown) so neither highlight obscures the other
+		local highlightPadding = optionsDB.borderName ~= "None" and (optionsDB.borderOffset + optionsDB.borderSize + 3) or 3
+		aura.identityHighlight:ClearAllPoints()
+		aura.identityHighlight:SetPoint("TOPLEFT", -highlightPadding, highlightPadding)
+		aura.identityHighlight:SetPoint("BOTTOMRIGHT", highlightPadding, -highlightPadding)
 
 		if optionsDB.showDispelType then
 			aura.dispelIcon:ClearAllPoints()
