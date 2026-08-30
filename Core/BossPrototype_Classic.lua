@@ -1236,6 +1236,12 @@ do
 		return moduleAurasList[self][index].mechanic
 	end
 
+	--- Get the aura dispel type. (Magic/Curse/Poison/Disease)
+	-- @return string or nil
+	function boss:GetAuraDispelType(spellID)
+		return self:GetAuraType(spellID)
+	end
+
 	--- Get the aura note.
 	-- @return string or nil
 	function boss:GetAuraNote(spellID)
@@ -1247,6 +1253,18 @@ do
 
 		local note = moduleAurasList[self][index].note
 		return note
+	end
+
+	--- Get the aura tip. A short description of the aura, shown in the aura configuration UI.
+	-- @return string or nil
+	function boss:GetAuraTip(spellID)
+		local index = moduleAurasList[self] and moduleAurasList[self].spellIDToIndex[spellID]
+		if not index then
+			error(("Module %q has no aura data for spell ID %q."):format(self.moduleName, tostring(spellID)))
+			return
+		end
+
+		return moduleAurasList[self][index].tip
 	end
 
 	--- Get the aura header.
