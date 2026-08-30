@@ -51,6 +51,7 @@ do
 		icon = true,
 		iconTooltip = true,
 		iconPosition = "LEFT",
+		highlightMyTargetBar = true,
 		fill = false,
 		barStyle = "Default",
 		emphasize = true,
@@ -726,6 +727,13 @@ do
 						name = L.iconTooltip,
 						desc = L.iconTooltipDesc,
 						order = 18,
+						disabled = function() return not db.icon end,
+					},
+					highlightMyTargetBar = {
+						type = "toggle",
+						name = L.highlightMyTargetBar,
+						desc = L.highlightMyTargetBarDesc,
+						order = 18.5,
 						disabled = function() return not db.icon end,
 					},
 					spellIndicators = {
@@ -1815,7 +1823,23 @@ do
 	end
 
 	local initial = true
-	function plugin:CreateBar(module, key, text, time, icon, isApprox, eventId, spellIndicators)
+	local function SetMineHighlight(bar, isMine)
+		local highlight = bar.candyBarIconFrame.myTargetHighlight
+		if db.highlightMyTargetBar and isMine then
+			if not highlight then
+				highlight = bar.candyBarIconFrame:CreateTexture(nil, "BACKGROUND")
+				highlight:SetColorTexture(0.2, 1, 0.2, 0.6)
+				highlight:SetPoint("TOPLEFT", -3, 3)
+				highlight:SetPoint("BOTTOMRIGHT", 3, -3)
+				bar.candyBarIconFrame.myTargetHighlight = highlight
+			end
+			highlight:Show()
+		elseif highlight then
+			highlight:Hide()
+		end
+	end
+
+	function plugin:CreateBar(module, key, text, time, icon, isApprox, eventId, spellIndicators, isMine)
 		local width, height
 		width = db.normalWidth
 		height = db.normalHeight
@@ -1842,6 +1866,7 @@ do
 		else
 			bar:SetIcon(nil)
 		end
+		SetMineHighlight(bar, isMine)
 		bar:SetColor(colors:GetColor("barColor", module, key))
 		bar:SetBackgroundColor(colors:GetColor("barBackground", module, key))
 		bar:SetTextColor(colors:GetColor("barText", module, key))
@@ -1900,14 +1925,14 @@ do
 		bwTooltip:Hide()
 	end
 
-	function plugin:BigWigs_StartBar(_, module, key, text, time, icon, isApprox, maxTime, eventId, spellIndicators)
+	function plugin:BigWigs_StartBar(_, module, key, text, time, icon, isApprox, maxTime, eventId, spellIndicators, isMine)
 		if not text then text = "" end
 		if not eventId and self:IsSecret(text) then
 			BigWigs:Error("Cannot start a bar with secrets when no eventId is specified.")
 			return
 		end
 		self:StopSpecificBar(nil, module, text, eventId)
-		local bar = self:CreateBar(module, key, text, time, icon, isApprox, eventId, spellIndicators)
+		local bar = self:CreateBar(module, key, text, time, icon, isApprox, eventId, spellIndicators, isMine)
 		if db.iconTooltip and type(key) == "number" and key > 0 then
 			bar.candyBarIconFrame.bwID = key
 			bar:Set("bigwigs:tooltip", key)

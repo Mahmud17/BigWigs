@@ -4481,7 +4481,7 @@ do
 		if player == myName then
 			local msg = format(CL.you, textType == "string" and text or spells[text or key])
 			if isBarEnabled then
-				self:SendMessage("BigWigs_StartBar", self, key, msg, time, icons[icon or textType == "number" and text or key], false, maxTime)
+				self:SendMessage("BigWigs_StartBar", self, key, msg, time, icons[icon or textType == "number" and text or key], false, maxTime, nil, nil, true)
 			end
 			if checkFlag(self, key, C.COUNTDOWN) then
 				self:SendMessage("BigWigs_StartCountdown", self, key, msg, time)
