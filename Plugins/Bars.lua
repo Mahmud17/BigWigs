@@ -51,7 +51,7 @@ do
 		icon = true,
 		iconTooltip = true,
 		iconPosition = "LEFT",
-		highlightMyTargetBar = true,
+		highlightTargetBars = true,
 		fill = false,
 		barStyle = "Default",
 		emphasize = true,
@@ -729,10 +729,10 @@ do
 						order = 18,
 						disabled = function() return not db.icon end,
 					},
-					highlightMyTargetBar = {
+					highlightTargetBars = {
 						type = "toggle",
-						name = L.highlightMyTargetBar,
-						desc = L.highlightMyTargetBarDesc,
+						name = L.highlightTargetBars,
+						desc = L.highlightTargetBarsDesc,
 						order = 18.5,
 						disabled = function() return not db.icon end,
 					},
@@ -1823,23 +1823,28 @@ do
 	end
 
 	local initial = true
-	local function SetMineHighlight(bar, isMine)
-		local highlight = bar.candyBarIconFrame.myTargetHighlight
-		if db.highlightMyTargetBar and isMine then
+	local targetHighlightColors = {
+		mine = {0.2, 1, 0.2, 0.6}, -- green: the debuff is on you
+		other = {0.7, 0.2, 1, 0.6}, -- purple: the debuff is on someone else specifically (e.g. the co-tank)
+	}
+	local function SetTargetHighlight(bar, targetHighlight)
+		local highlight = bar.candyBarIconFrame.targetHighlight
+		local color = db.highlightTargetBars and targetHighlightColors[targetHighlight]
+		if color then
 			if not highlight then
 				highlight = bar.candyBarIconFrame:CreateTexture(nil, "BACKGROUND")
-				highlight:SetColorTexture(0.2, 1, 0.2, 0.6)
 				highlight:SetPoint("TOPLEFT", -3, 3)
 				highlight:SetPoint("BOTTOMRIGHT", 3, -3)
-				bar.candyBarIconFrame.myTargetHighlight = highlight
+				bar.candyBarIconFrame.targetHighlight = highlight
 			end
+			highlight:SetColorTexture(unpack(color))
 			highlight:Show()
 		elseif highlight then
 			highlight:Hide()
 		end
 	end
 
-	function plugin:CreateBar(module, key, text, time, icon, isApprox, eventId, spellIndicators, isMine)
+	function plugin:CreateBar(module, key, text, time, icon, isApprox, eventId, spellIndicators, targetHighlight)
 		local width, height
 		width = db.normalWidth
 		height = db.normalHeight
@@ -1866,7 +1871,7 @@ do
 		else
 			bar:SetIcon(nil)
 		end
-		SetMineHighlight(bar, isMine)
+		SetTargetHighlight(bar, targetHighlight)
 		bar:SetColor(colors:GetColor("barColor", module, key))
 		bar:SetBackgroundColor(colors:GetColor("barBackground", module, key))
 		bar:SetTextColor(colors:GetColor("barText", module, key))
@@ -1925,14 +1930,14 @@ do
 		bwTooltip:Hide()
 	end
 
-	function plugin:BigWigs_StartBar(_, module, key, text, time, icon, isApprox, maxTime, eventId, spellIndicators, isMine)
+	function plugin:BigWigs_StartBar(_, module, key, text, time, icon, isApprox, maxTime, eventId, spellIndicators, targetHighlight)
 		if not text then text = "" end
 		if not eventId and self:IsSecret(text) then
 			BigWigs:Error("Cannot start a bar with secrets when no eventId is specified.")
 			return
 		end
 		self:StopSpecificBar(nil, module, text, eventId)
-		local bar = self:CreateBar(module, key, text, time, icon, isApprox, eventId, spellIndicators, isMine)
+		local bar = self:CreateBar(module, key, text, time, icon, isApprox, eventId, spellIndicators, targetHighlight)
 		if db.iconTooltip and type(key) == "number" and key > 0 then
 			bar.candyBarIconFrame.bwID = key
 			bar:Set("bigwigs:tooltip", key)
