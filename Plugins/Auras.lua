@@ -16,6 +16,12 @@ local FONT = LibSharedMedia.MediaType and LibSharedMedia.MediaType.FONT or "font
 local SOUND = LibSharedMedia.MediaType and LibSharedMedia.MediaType.SOUND or "sound"
 local ARROW = [[Interface\AddOns\BigWigs\Media\Icons\arrows_up]]
 
+-- Matches the coloring used for targeted bars: green for auras on you, purple for the other tracked player
+local identityHighlightColors = {
+	player = {0.2, 1, 0.2, 0.6},
+	other = {0.7, 0.2, 1, 0.6},
+}
+
 local CONFIG_MODE_DURATION = 10
 
 local db
@@ -2250,6 +2256,11 @@ do
 
 		aura:EnableMouse(optionsDB.showTooltip)
 		aura:SetSize(size, size) -- CustomAuraContainerFlowLayoutDescription:ApplyElementLayout doesn't set size
+
+		local identityHighlight = aura:CreateTexture(nil, "BACKGROUND", nil, -1)
+		identityHighlight:SetPoint("TOPLEFT", -3, 3)
+		identityHighlight:SetPoint("BOTTOMRIGHT", 3, -3)
+		identityHighlight:SetColorTexture(unpack(identityHighlightColors[unitType]))
 
 		local icon = aura:CreateTexture(nil, "BACKGROUND")
 		icon:SetAllPoints()
