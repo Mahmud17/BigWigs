@@ -1151,6 +1151,13 @@ local function AuraSoundDropdownValueChanged(widget, _, value)
 	options:SendMessage("BigWigs_RefreshAuraSounds", module)
 end
 
+local dispelTypeIcons = {
+	Magic = [[Interface\RaidFrame\Raid-Icon-DebuffMagic]],
+	Curse = [[Interface\RaidFrame\Raid-Icon-DebuffCurse]],
+	Disease = [[Interface\RaidFrame\Raid-Icon-DebuffDisease]],
+	Poison = [[Interface\RaidFrame\Raid-Icon-DebuffPoison]],
+}
+
 local function getAuraOptions(module, spellID)
 	local key = spellID
 	local config = module.db.profile.auras[spellID]
@@ -1176,6 +1183,12 @@ local function getAuraOptions(module, spellID)
 	spellLabel:SetFontObject(GameFontNormal)
 	spellLabel:SetFullWidth(true)
 
+	local tipLabel = AceGUI:Create("Label")
+	tipLabel:SetText(module:GetAuraTip(spellID) or "")
+	tipLabel:SetColor(1, 1, 1)
+	tipLabel:SetFontObject(GameFontNormal)
+	tipLabel:SetFullWidth(true)
+
 	local icon = AceGUI:Create("Icon")
 	icon:SetImage(texture, 0.07, 0.93, 0.07, 0.93)
 	icon:SetImageSize(40, 40)
@@ -1185,6 +1198,21 @@ local function getAuraOptions(module, spellID)
 	icon:SetUserData("updateTooltip", true)
 	icon:SetCallback("OnEnter", auraOnEnter)
 	icon:SetCallback("OnLeave", optionsTooltip_Hide)
+
+	local dispelIcon = icon.frame.auraDispelTypeIcon
+	if not dispelIcon then
+		dispelIcon = icon.frame:CreateTexture(nil, "OVERLAY")
+		dispelIcon:SetSize(16, 16)
+		dispelIcon:SetPoint("TOPRIGHT", icon.frame, "TOPRIGHT", 2, 2)
+		icon.frame.auraDispelTypeIcon = dispelIcon
+	end
+	local dispelTexture = dispelTypeIcons[module:GetAuraDispelType(spellID)]
+	if dispelTexture then
+		dispelIcon:SetTexture(dispelTexture)
+		dispelIcon:Show()
+	else
+		dispelIcon:Hide()
+	end
 
 	local appliedDropdown = AceGUI:Create("BigWigsSharedDropdown")
 	appliedDropdown:SetLabel(L.onApplied)
@@ -1264,11 +1292,11 @@ local function getAuraOptions(module, spellID)
 	end
 
 	if defaultDoseSound then
-		return spellLabel, icon, appliedDropdown, doseDropdown, removedDropdown
+		return spellLabel, tipLabel, icon, appliedDropdown, doseDropdown, removedDropdown
 	elseif hasDuration then
-		return spellLabel, icon, appliedDropdown, removedDropdown, durationCheck
+		return spellLabel, tipLabel, icon, appliedDropdown, removedDropdown, durationCheck
 	else
-		return spellLabel, icon, appliedDropdown, removedDropdown
+		return spellLabel, tipLabel, icon, appliedDropdown, removedDropdown
 	end
 end
 
